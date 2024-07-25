@@ -44,6 +44,9 @@ DRIVER_INCS_odbc ?= -DUNIXODBC -I/usr/local/include
 # - Firebird
 DRIVER_LIBS_firebird ?= -L/usr/local/firebird -lfbclient
 DRIVER_INCS_firebird ?=
+# - DuckDB
+DRIVER_LIBS_duckdb ?= -lduckdb
+DRIVER_INCS_duckdb ?=
 
 # general compilation parameters
 WARN= -fPIC $(OPTFLAGS) -Wmissing-prototypes -Wmissing-declarations -ansi -pedantic
