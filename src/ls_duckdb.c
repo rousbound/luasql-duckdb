@@ -409,14 +409,32 @@ static int create_connection(lua_State *L, int env, duckdb_connection *const con
 */
 static int env_connect(lua_State *L) {
     const char *sourcename = luaL_checkstring(L, 2);
+	  // const char *config = luaL_gettable(L, 7, NULL);
     duckdb_database db;
     duckdb_connection con;
+    duckdb_config conf;
+    duckdb_create_config(&conf);
+    if (lua_gettop(L) >= 7 && !lua_isnil(L, 7)) {
+        luaL_checktype(L, 7, LUA_TTABLE);
+        lua_pushnil(L); // First key
+        while (lua_next(L, 7) != 0) {
+            // Get the key and value from the table
+            const char *key = lua_tostring(L, -2);
+            const char *val = lua_tostring(L, -1);
+
+            // Set the configuration option
+            duckdb_set_config(conf, key, val);
+
+            lua_pop(L, 1); // Remove value, keep key for the next iteration
+        }
+    }
 
     char * error = NULL;
 
     getenvironment(L);	/* validate environment */
 
-    if (duckdb_open_ext(sourcename, &db, NULL, &error) != DuckDBSuccess) {
+    // Needs to pass in db config in third parameter here
+    if (duckdb_open_ext(sourcename, &db, conf, &error) != DuckDBSuccess) {
         return luasql_failmsg(L, "error connecting to database. DuckDB: ", error);
     }
     if (duckdb_connect(db, &con) != DuckDBSuccess) {
